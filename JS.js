@@ -16,10 +16,6 @@ var view = { // объект представление -обновляет из
 // проверка объекта view
 /*view.displayMiss('00');
 view.displayHit('34');
-view.displayMiss('55');
-view.displayHit('12');
-view.displayMiss('25');
-view.displayHit('26');
 view.displayMessage('tap tap, is this thing on?');*/
 
 var model = {
@@ -43,7 +39,7 @@ var model = {
 				view.displayMessage ('HIT!');
 				if (this.isSunk (ship)) {
 					view.displayMessage ('You sank my battleship!');
-					this.ship.Sunk++;
+					this.shipsSunk++;
 				}
 				return true;				
 			}
@@ -52,7 +48,7 @@ var model = {
 		view.displayMessage ('You missed.');
 		return false;
 	},
-	inSunk: function (ship) { // метод на проверку потоплен ли корабль
+	isSunk: function (ship) { // метод на проверку потоплен ли корабль
 		for (var i = 0; i <this.shipLength;i++) { // проверка длины коробля
 			if (ship.hits[i] !== 'hit') { //вернет true когда все 3 клетки будут hit
 				return false;
@@ -60,9 +56,63 @@ var model = {
 		}
 		return true;
 	},
-}
+};
 // проверка объекта model
 /*model.fire('53');
 model.fire('06');*/
+
+
+//реализация контроллера
+
+var controller = {
+	guesses: 0, //кол-во выстрелов
+	processGuess: function (guess) { // метод, получающий координаты в формате "А0"
+	var location = parseGuess(guess); // проверка введенных данных 
+		if (location) {	// если  метод не вернул null, значит, был получен действительный объект location	
+			this.guesses++; 
+			var hit = model.fire(location);
+			if (hit && model.shipsSunk === model.numShips) {
+				view.displayMessage('You sank all my battleships, in ' + this.guesses + 'guesses');
+			}
+		}
+	}
+};
+// проверка
+controller.processGuess ('A0');
+controller.processGuess ('A6');
+controller.processGuess ('B6');
+controller.processGuess ('C6');
+controller.processGuess ('C4');
+controller.processGuess ('D4');
+controller.processGuess ('E4');
+controller.processGuess ('B0');
+controller.processGuess ('B1');
+controller.processGuess ('B2');
+			
+function parseGuess (guess) {
+	var alphabet = ['A','B','C','D','E','F','G'];
+	if (guess === null || guess.length !== 2) { // проверка на не корректный ввод данных пользователем (отправил пустую строку или больше двух символов)
+		alert ('Oops, please enter a letter and  namber on the board.');
+	} else {
+		firstChar = guess.charAt (0); // извлекает первый символ строки
+		var row = alphabet.indexOf(firstChar);// проверяем на наличие буквы в массиве alphabet
+		var column = guess.charAt (1); // получаем номер столбца
+		if (isNaN(row) || isNaN(column)) { // проверка, что в row  column нет букв и других символов кроме чисел
+			alert ('Oops,that is not on the board.'); // этот блок выполнися если хотя бы один isNan вернет true
+		} else if (row < 0 || row >= model.boardSize || column <0 || column >= model.boardSize) { // проверка пользоват.ввода в пределах игоровой доски
+			alert ('Oops,that is off the board!');
+		} else {
+			return row + column; 
+		}
+	}
+	return null;
+};
+//проверка
+/*console.log (parseGuess ('A0'));
+console.log (parseGuess ('Н0'));*/
+
+
+
+
 
 
