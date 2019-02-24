@@ -78,7 +78,7 @@ var controller = {
 	}
 };
 // проверка
-controller.processGuess ('A0');
+/*controller.processGuess ('A0');
 controller.processGuess ('A6');
 controller.processGuess ('B6');
 controller.processGuess ('C6');
@@ -87,7 +87,7 @@ controller.processGuess ('D4');
 controller.processGuess ('E4');
 controller.processGuess ('B0');
 controller.processGuess ('B1');
-controller.processGuess ('B2');
+controller.processGuess ('B2');*/
 			
 function parseGuess (guess) {
 	var alphabet = ['A','B','C','D','E','F','G'];
@@ -110,6 +110,56 @@ function parseGuess (guess) {
 //проверка
 /*console.log (parseGuess ('A0'));
 console.log (parseGuess ('Н0'));*/
+
+function init() {
+	var fireButton = document.getElementById('fireButton');
+	fireButton.onclick = handleFireButton; //ссылка на кнопку Fire!
+	var guessInput = document.getElementById('guessInput');
+	guessInput.onkeypress = handleKeyPress; // обавляем новый обработчик
+}
+
+function handleKeyPress (e) { // обработчик нажатий клавиши 
+	var fireButton = document.getElementById('fireButton');
+	if (e.keyCode === 13) {
+		fireButton.click();
+		return false;
+	}
+}
+
+function handleFireButton () { //функция вызывается при каждом нажатии кнопки Fire!
+	var guessInput = document.getElementById ('guessInput');
+	var guess = guessInput.value; // получаем координаты введенные пользователем
+	controller.processGuess(guess);
+	guessInput.value = '';
+}
+
+window.onload = init;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
