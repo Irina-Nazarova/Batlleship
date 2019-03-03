@@ -24,9 +24,9 @@ var model = {
 	shipLength: 3, //длина каждогоо корабля
 	shipsSunk: 0, // кол-во потопленных кораблей
 	ships:  [ //массив, каждый элемент кот.содержит корабль
-		{ locations: [ '06','16','26'], hits: ['', '', ''] }, 
-	    { locations: [ '24','34','44'], hits: ['', '', ''] },
-		{ locations: [ '10','11','12'], hits: ['', '', ''] }
+		 { locations: [ '0','0','0'], hits: ['', '', ''] }, 
+	    { locations: [ '0','0','0'], hits: ['', '', ''] },
+		{ locations: [ '0','0','0'], hits: ['', '', ''] }
 	],
 	
 	fire: function (guess) { //метод получает координы выстрелов
@@ -56,6 +56,49 @@ var model = {
 		}
 		return true;
 	},
+	
+	generateShipLocations: function(){
+		var locations;
+		for (var i = 0; i < this.numShips; i++) { // для каждого корабля генерируется набор позиций (клеток)
+			do {
+				locations = this.generateShip(); // генерирует новый набор позиций
+			} while (this.collision(locations)); // проверяем, перекрываются ли эти позиции с существ.-ми кораблями
+			this.ships[i].locations = locations; // полученные позиции без перекрытий сохраняются в свойстве location в массиве model.ships
+		}
+	},
+	
+	generateShip: function() {
+		var direction = Math.floor(Math.random() * 2); // генерируем число от 0 до 1 и * 2, что бы получить число в диапазоне от 0 до 2 (не включая 2), затем Math.floor преобразует в 0 или 1
+		var row, col;		
+		if (direction === 1) { // если значение = 1, то создается горизонтальный корабль
+			row = Math.floor(Math.random() * this.boardSize); //генерирует начальную позицию коробля на игровом поле
+			col = Math.floor(Math.random() * (this.boardSize - this.shipLength));
+		} else { // если значение = 0, то создается вертикальный корабль
+			row = Math.floor(Math.random() * (this.boardSize - this.shipLength));
+			col = Math.floor(Math.random() * this.boardSize);
+		}
+		var newShipLocations = []; // набор позиций нового корабля в кот. последовательно добавляются элементы
+		for (var i = 0; i < this.shipLength; i++) { // в цикле до кол-ва позиций в корабле
+			if (direction === 1) { // при каждой итерации новая позиция добавляется  в массив newShipsLocations
+				newShipLocations.push(row + '' + (col + i)); // 0 1+0, 
+			} else {
+				newShipLocations.push((row + i) + '' + col);
+			}
+		}
+		return newShipLocations; // когда позиции сгенерированы, метод возвращает массив
+	},
+	
+	collision: function(locations) { // массив позиций нового корабля
+		for (var i = 0; i < this.numShips; i++) { // перебирает все корабли в модели
+			var ship = model.ships[i]; // для каждого корабля, уже находящегося на поле
+			for (var j = 0; j < locations.length; j++) { // перебирает  все позиции, проверяемые на перекрытие 
+				if (ship.locations.indexOf(locations[j]) >= 0) { // метод indexOf присутствует ли заданная позиция в массиве, если индекс больше 0, то клетка занята и вернет true (перекрытие обнаружено).
+					return true;
+				}
+			}
+		}
+		return false; // перекрытие отсутствует
+	}
 };
 // проверка объекта model
 /*model.fire('53');
@@ -115,7 +158,9 @@ function init() {
 	var fireButton = document.getElementById('fireButton');
 	fireButton.onclick = handleFireButton; //ссылка на кнопку Fire!
 	var guessInput = document.getElementById('guessInput');
-	guessInput.onkeypress = handleKeyPress; // обавляем новый обработчик
+	guessInput.onkeypress = handleKeyPress; // обнавляем новый обработчик
+	
+	model.generateShipLocations();
 }
 
 function handleKeyPress (e) { // обработчик нажатий клавиши 
@@ -134,14 +179,6 @@ function handleFireButton () { //функция вызывается при ка
 }
 
 window.onload = init;
-
-
-
-
-
-
-
-
 
 
 
